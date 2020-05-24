@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:intl/intl.dart';
 
 class Validation {
@@ -15,5 +13,21 @@ class Validation {
     Duration dif = e.difference(td);
     int dd = dif.inDays + 1;
     return (dd > 0) ? dd.toString() : '0';
+  }
+
+  static bool strToBool(String str) {
+    return (int.parse(str) > 0) ? true : false;
+  }
+
+  static bool intToBool(int val) {
+    return (val > 0) ? true : false;
+  }
+
+  static String boolToStr(bool val) {
+    return (val == true) ? '1' : '0';
+  }
+
+  static int boolToInt(bool val) {
+    return (val == true) ? 1 : 0;
   }
 }

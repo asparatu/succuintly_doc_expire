@@ -1,6 +1,7 @@
 import '../util/utils.dart';
 
 class Doc {
+  // Doc class properties.
   int id;
   String title;
   String expiration;
@@ -10,9 +11,11 @@ class Doc {
   int fqQuarter;
   int fqMonth;
 
+  // Constructor used if we don’t want to assign an id immediately.
   Doc(this.title, this.expiration, this.fqYear, this.fqHalfYear, this.fqQuarter,
       this.fqMonth);
 
+  // Constructor used if we want to assign an id immediately
   Doc.withId(this.id, this.title, this.expiration, this.fqYear, this.fqHalfYear,
       this.fqQuarter, this.fqMonth);
 

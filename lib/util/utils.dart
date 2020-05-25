@@ -63,7 +63,7 @@ class DateUtils {
 
   static bool isDate(String dt) {
     try {
-      DateTime d = DateFormat('yyyy-MM-dd').parseStrict(dt);
+      DateFormat('yyyy-MM-dd').parseStrict(dt);
       return true;
     } catch (e) {
       return false;

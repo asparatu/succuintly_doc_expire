@@ -23,21 +23,20 @@ class DbHelper {
   //Singleton
   static final DbHelper _dbHelper = DbHelper._internal();
 
-// Factory constructor
+  // Factory constructor
   DbHelper._internal();
 
   factory DbHelper() {
     return _dbHelper;
   }
 
-//Database entry point
+  //Database entry point
   static Database _db;
 
   Future<Database> get db async {
     if (_db == null) {
       _db = await initializeDb();
     }
-
     return _db;
   }
 
@@ -67,7 +66,6 @@ class DbHelper {
     } catch (e) {
       debugPrint('insertDoc: ' + e.toString());
     }
-
     return r;
   }
 

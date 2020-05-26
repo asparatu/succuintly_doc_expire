@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 
@@ -56,25 +58,25 @@ class _DocDetailState extends State<DocDetail> {
     _fqMonthCtrl = widget.doc.fqMonth != null
         ? Validation.intToBool(widget.doc.fqMonth)
         : false;
+  }
 
-    //Date Picker & Date function
-    Future _chooseDate(BuildContext context, String initialDateString) async {
-      DateTime now = new DateTime.now();
-      DateTime initialDate = DateUtils.convertToDate(initialDateString) ?? now;
+  //Date Picker & Date function
+  Future _chooseDate(BuildContext context, String initialDateString) async {
+    DateTime now = new DateTime.now();
+    DateTime initialDate = DateUtils.convertToDate(initialDateString) ?? now;
 
-      initialDate = (initialDate.year >= now.year && initialDate.isAfter(now)
-          ? initialDate
-          : now);
+    initialDate = (initialDate.year >= now.year && initialDate.isAfter(now)
+        ? initialDate
+        : now);
 
-      DatePicker.showDatePicker(context,
-          showTitleActions: true, currentTime: initialDate, onConfirm: (date) {
-        setState(() {
-          DateTime dt = date;
-          String r = DateUtils.ftDateAsStr(dt);
-          _expirationCtrl.text = r;
-        });
+    DatePicker.showDatePicker(context,
+        showTitleActions: true, currentTime: initialDate, onConfirm: (date) {
+      setState(() {
+        DateTime dt = date;
+        String r = DateUtils.ftDateAsStr(dt);
+        _expirationCtrl.text = r;
       });
-    }
+    });
   }
 
   //Delete Doc
@@ -143,6 +145,166 @@ class _DocDetailState extends State<DocDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    const String cStrDays = "Enter a number of days";
+    TextStyle tStyle = Theme
+        .of(context)
+        .textTheme
+        .headline6;
+    String ttl = widget.doc.title;
+
+    return Scaffold(
+      key: _scaffoldKey,
+      resizeToAvoidBottomPadding: false,
+      appBar: AppBar(
+        title: Text(ttl != "" ? widget.doc.title : "New Document"),
+        actions: (ttl == "")
+            ? <Widget>[]
+            : <Widget>[
+          PopupMenuButton(
+            onSelected: _selectMenu,
+            itemBuilder: (BuildContext context) {
+              return _menuOptions.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(
+                    choice,
+                  ),
+                );
+              }).toList();
+            },
+          ),
+        ],
+      ),
+      body: Form(
+        key: _formKey,
+        autovalidate: true,
+        child: SafeArea(
+          top: false,
+          bottom: false,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            children: <Widget>[
+              //Title Form Field
+              TextFormField(
+                inputFormatters: [
+                  WhitelistingTextInputFormatter(RegExp('[a-zA-Z0-9]')),
+                ],
+                controller: _titleCtrl,
+                style: tStyle,
+                validator: (val) => Validation.validateTitle(val),
+                decoration: InputDecoration(
+                  icon: const Icon(Icons.title),
+                  hintText: 'Enter the document name',
+                  labelText: 'Document Name',
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: TextFormField(
+                      controller: _expirationCtrl,
+                      maxLength: 10,
+                      decoration: InputDecoration(
+                          icon: const Icon(Icons.calendar_today),
+                          hintText: 'Expiry date (i.e. ' +
+                              DateUtils.daysAheadAsStr(_daysAhead) +
+                              ')',
+                          labelText: 'Expiry Date'),
+                      keyboardType: TextInputType.number,
+                      validator: (val) =>
+                      DateUtils.isValidDate(val)
+                          ? null
+                          : 'Not a valid future date',
+                    ),
+                  ),
+                  IconButton(
+                      icon: new Icon(Icons.more_horiz),
+                      tooltip: 'Choose date',
+                      onPressed: (() {
+                        _chooseDate(context, _expirationCtrl.text);
+                      }))
+                ],
+              ),
+              //Expiration Date
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(' '),
+                  ),
+                ],
+              ),
+              //One Year Switch Button
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text('a. Alert @ 1.5 & 1 year(s)'),
+                  ),
+                  Switch(
+                      value: _fqYearCtrl,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _fqYearCtrl = value;
+                        });
+                      })
+                ],
+              ),
+              //Half Year Switch Button
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text('b. Alert @ 6 Months'),
+                  ),
+                  Switch(
+                      value: _fqHalfYearCtrl,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _fqHalfYearCtrl = value;
+                        });
+                      })
+                ],
+              ),
+              // Quarter Year Switch Button
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text('a. Alert @ 3 Months'),
+                  ),
+                  Switch(
+                      value: _fqQuarterCtrl,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _fqQuarterCtrl = value;
+                        });
+                      })
+                ],
+              ),
+              //One month or less Switch Button
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text('a. Alert @ 1 month or less'),
+                  ),
+                  Switch(
+                      value: _fqMonthCtrl,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _fqMonthCtrl = value;
+                        });
+                      })
+                ],
+              ),
+              //Save Button
+              Container(
+                padding: const EdgeInsets.only(left: 40.0, top: 20.0),
+                child: RaisedButton(
+                  child: Text('Save'),
+                  onPressed: _submitForm,
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

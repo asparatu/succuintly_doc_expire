@@ -75,48 +75,70 @@ class _DocDetailState extends State<DocDetail> {
         });
       });
     }
+  }
 
-    //Delete Doc
-    void _deleteDoc(int id) async {
-      await widget.dbh.deleteDoc(widget.doc.id);
+  //Delete Doc
+  void _deleteDoc(int id) async {
+    await widget.dbh.deleteDoc(widget.doc.id);
+    Navigator.pop(context, true);
+  }
+
+  //Upper Menu
+  void _selectMenu(String value) async {
+    switch (value) {
+      case _menuDelete:
+        if (widget.doc.id == -1) {
+          return;
+        }
+        await _deleteDoc(widget.doc.id);
+    }
+  }
+
+  //Save Doc
+  void _saveDoc() {
+    widget.doc.title = _titleCtrl.text;
+    widget.doc.expiration = _expirationCtrl.text;
+
+    widget.doc.fqYear = Validation.boolToInt(_fqYearCtrl);
+    widget.doc.fqHalfYear = Validation.boolToInt(_fqHalfYearCtrl);
+    widget.doc.fqYear = Validation.boolToInt(_fqYearCtrl);
+    widget.doc.fqMonth = Validation.boolToInt(_fqMonthCtrl);
+
+    if (widget.doc.id > -1) {
+      debugPrint("_update->Doc Id: " + widget.doc.id.toString());
+      widget.dbh.updateDoc(widget.doc);
       Navigator.pop(context, true);
-    }
-
-    //Upper Menu
-    void _selectMenu(String value) async {
-      switch (value) {
-        case _menuDelete:
-          if (widget.doc.id == -1) {
-            return;
-          }
-          await _deleteDoc(widget.doc.id);
-      }
-    }
-
-    //Save Doc
-    void _saveDoc() {
-      widget.doc.title = _titleCtrl.text;
-      widget.doc.expiration = _expirationCtrl.text;
-
-      widget.doc.fqYear = Validation.boolToInt(_fqYearCtrl);
-      widget.doc.fqHalfYear = Validation.boolToInt(_fqHalfYearCtrl);
-      widget.doc.fqYear = Validation.boolToInt(_fqYearCtrl);
-      widget.doc.fqMonth = Validation.boolToInt(_fqMonthCtrl);
-
-      if (widget.doc.id > -1) {
-        debugPrint("_update->Doc Id: " + widget.doc.id.toString());
-        widget.dbh.updateDoc(widget.doc);
+    } else {
+      Future<int> idd = widget.dbh.getMaxId();
+      idd.then((result) {
+        debugPrint("_insert->Doc Id: " + widget.doc.id.toString());
+        widget.doc.id = (result != null) ? result + 1 : 1;
+        widget.dbh.insertDoc(widget.doc);
         Navigator.pop(context, true);
-      } else {
-        Future<int> idd = widget.dbh.getMaxId();
-        idd.then((result) {
-          debugPrint("_insert->Doc Id: " + widget.doc.id.toString());
-          widget.doc.id = (result != null) ? result + 1 : 1;
-          widget.dbh.insertDoc(widget.doc);
-          Navigator.pop(context, true);
-        });
-      }
+      });
     }
+  }
+
+  //Submit form
+  void showMessage(String message, [MaterialColor color = Colors.red]) {
+    _scaffoldKey.currentState.showSnackBar(
+        new SnackBar(backgroundColor: color, content: new Text(message)));
+  }
+
+  void _submitForm() {
+    final FormState form = _formKey.currentState;
+
+    if (!form.validate()) {
+      showMessage('Some data is invalid. Please correct.');
+    } else {
+      _saveDoc();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initCtrls();
   }
 
   @override

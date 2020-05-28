@@ -80,6 +80,7 @@ class _DocListState extends State<DocList> {
 
   void _showResetDialog() {
     showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (BuildContext context) {
           return new AlertDialog(

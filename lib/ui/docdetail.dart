@@ -184,7 +184,7 @@ class _DocDetailState extends State<DocDetail> {
               //Title Form Field
               TextFormField(
                 inputFormatters: [
-                  WhitelistingTextInputFormatter(RegExp('[a-zA-Z0-9]')),
+                  WhitelistingTextInputFormatter(RegExp('[A-Za-z0-9\\s]')),
                 ],
                 controller: _titleCtrl,
                 style: tStyle,
@@ -233,7 +233,7 @@ class _DocDetailState extends State<DocDetail> {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text('a. Alert @ 1.5 & 1 year(s)'),
+                    child: Text('Alert @ 1.5 & 1 year(s)'),
                   ),
                   Switch(
                       value: _fqYearCtrl,
@@ -248,7 +248,7 @@ class _DocDetailState extends State<DocDetail> {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text('b. Alert @ 6 Months'),
+                    child: Text('Alert @ 6 Months'),
                   ),
                   Switch(
                       value: _fqHalfYearCtrl,
@@ -263,7 +263,7 @@ class _DocDetailState extends State<DocDetail> {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text('a. Alert @ 3 Months'),
+                    child: Text('Alert @ 3 Months'),
                   ),
                   Switch(
                       value: _fqQuarterCtrl,
@@ -278,7 +278,7 @@ class _DocDetailState extends State<DocDetail> {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text('a. Alert @ 1 month or less'),
+                    child: Text('Alert @ 1 month or less'),
                   ),
                   Switch(
                       value: _fqMonthCtrl,

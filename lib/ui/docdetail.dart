@@ -15,10 +15,10 @@ const _menuDelete = "Delete";
 final List<String> _menuOptions = const <String>[_menuDelete];
 
 class DocDetail extends StatefulWidget {
-  Doc doc;
-  final DbHelper dbh = DbHelper();
+  Doc _doc;
+  final DbHelper _dbh = DbHelper();
 
-  DocDetail(this.doc);
+  DocDetail(this._doc);
 
   @override
   _DocDetailState createState() => _DocDetailState();
@@ -42,21 +42,21 @@ class _DocDetailState extends State<DocDetail> {
 
   //initialization code
   void _initCtrls() {
-    _titleCtrl.text = widget.doc.title != null ? widget.doc.title : "";
+    _titleCtrl.text = widget._doc.title != null ? widget._doc.title : "";
     _expirationCtrl.text =
-        widget.doc.expiration != null ? widget.doc.expiration : "";
+        widget._doc.expiration != null ? widget._doc.expiration : "";
 
-    _fqYearCtrl = widget.doc.fqYear != null
-        ? Validation.intToBool(widget.doc.fqYear)
+    _fqYearCtrl = widget._doc.fqYear != null
+        ? Validation.intToBool(widget._doc.fqYear)
         : false;
-    _fqHalfYearCtrl = widget.doc.fqHalfYear != null
-        ? Validation.intToBool(widget.doc.fqHalfYear)
+    _fqHalfYearCtrl = widget._doc.fqHalfYear != null
+        ? Validation.intToBool(widget._doc.fqHalfYear)
         : false;
-    _fqQuarterCtrl = widget.doc.fqQuarter != null
-        ? Validation.intToBool(widget.doc.fqQuarter)
+    _fqQuarterCtrl = widget._doc.fqQuarter != null
+        ? Validation.intToBool(widget._doc.fqQuarter)
         : false;
-    _fqMonthCtrl = widget.doc.fqMonth != null
-        ? Validation.intToBool(widget.doc.fqMonth)
+    _fqMonthCtrl = widget._doc.fqMonth != null
+        ? Validation.intToBool(widget._doc.fqMonth)
         : false;
   }
 
@@ -81,7 +81,7 @@ class _DocDetailState extends State<DocDetail> {
 
   //Delete Doc
   void _deleteDoc(int id) async {
-    await widget.dbh.deleteDoc(widget.doc.id);
+    await widget._dbh.deleteDoc(widget._doc.id);
     Navigator.pop(context, true);
   }
 
@@ -89,33 +89,33 @@ class _DocDetailState extends State<DocDetail> {
   void _selectMenu(String value) async {
     switch (value) {
       case _menuDelete:
-        if (widget.doc.id == -1) {
+        if (widget._doc.id == -1) {
           return;
         }
-        await _deleteDoc(widget.doc.id);
+        await _deleteDoc(widget._doc.id);
     }
   }
 
   //Save Doc
   void _saveDoc() {
-    widget.doc.title = _titleCtrl.text;
-    widget.doc.expiration = _expirationCtrl.text;
+    widget._doc.title = _titleCtrl.text;
+    widget._doc.expiration = _expirationCtrl.text;
 
-    widget.doc.fqYear = Validation.boolToInt(_fqYearCtrl);
-    widget.doc.fqHalfYear = Validation.boolToInt(_fqHalfYearCtrl);
-    widget.doc.fqYear = Validation.boolToInt(_fqYearCtrl);
-    widget.doc.fqMonth = Validation.boolToInt(_fqMonthCtrl);
+    widget._doc.fqYear = Validation.boolToInt(_fqYearCtrl);
+    widget._doc.fqHalfYear = Validation.boolToInt(_fqHalfYearCtrl);
+    widget._doc.fqYear = Validation.boolToInt(_fqYearCtrl);
+    widget._doc.fqMonth = Validation.boolToInt(_fqMonthCtrl);
 
-    if (widget.doc.id > -1) {
-      debugPrint("_update->Doc Id: " + widget.doc.id.toString());
-      widget.dbh.updateDoc(widget.doc);
+    if (widget._doc.id > -1) {
+      debugPrint("_update->Doc Id: " + widget._doc.id.toString());
+      widget._dbh.updateDoc(widget._doc);
       Navigator.pop(context, true);
     } else {
-      Future<int> idd = widget.dbh.getMaxId();
+      Future<int> idd = widget._dbh.getMaxId();
       idd.then((result) {
-        debugPrint("_insert->Doc Id: " + widget.doc.id.toString());
-        widget.doc.id = (result != null) ? result + 1 : 1;
-        widget.dbh.insertDoc(widget.doc);
+        debugPrint("_insert->Doc Id: " + widget._doc.id.toString());
+        widget._doc.id = (result != null) ? result + 1 : 1;
+        widget._dbh.insertDoc(widget._doc);
         Navigator.pop(context, true);
       });
     }
@@ -146,34 +146,31 @@ class _DocDetailState extends State<DocDetail> {
   @override
   Widget build(BuildContext context) {
     const String cStrDays = "Enter a number of days";
-    TextStyle tStyle = Theme
-        .of(context)
-        .textTheme
-        .headline6;
-    String ttl = widget.doc.title;
+    TextStyle tStyle = Theme.of(context).textTheme.headline6;
+    String ttl = widget._doc.title;
 
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        title: Text(ttl != "" ? widget.doc.title : "New Document"),
+        title: Text(ttl != "" ? widget._doc.title : "New Document"),
         actions: (ttl == "")
             ? <Widget>[]
             : <Widget>[
-          PopupMenuButton(
-            onSelected: _selectMenu,
-            itemBuilder: (BuildContext context) {
-              return _menuOptions.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(
-                    choice,
-                  ),
-                );
-              }).toList();
-            },
-          ),
-        ],
+                PopupMenuButton(
+                  onSelected: _selectMenu,
+                  itemBuilder: (BuildContext context) {
+                    return _menuOptions.map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(
+                          choice,
+                        ),
+                      );
+                    }).toList();
+                  },
+                ),
+              ],
       ),
       body: Form(
         key: _formKey,
@@ -211,8 +208,7 @@ class _DocDetailState extends State<DocDetail> {
                               ')',
                           labelText: 'Expiry Date'),
                       keyboardType: TextInputType.number,
-                      validator: (val) =>
-                      DateUtils.isValidDate(val)
+                      validator: (val) => DateUtils.isValidDate(val)
                           ? null
                           : 'Not a valid future date',
                     ),
